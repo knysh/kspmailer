@@ -3,7 +3,6 @@ package com.example.myproject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,7 +18,6 @@ import javax.mail.Multipart;
 import javax.mail.NoSuchProviderException;
 import javax.mail.Session;
 import javax.mail.Store;
-import javax.security.auth.login.AccountException;
 
 /** work with mail
  */
@@ -66,7 +64,7 @@ public class MailUtils {
 	 */
 	private static String getHost(String account){
 		if(account.contains("mail.ru")){
-			return "pop.mail.ru";
+			return "imap.mail.ru";
 		}
 		if(account.contains("inbox.ru")){
 			return "pop.inbox.ru";
@@ -82,7 +80,7 @@ public class MailUtils {
 	 * @return server host name
 	 */
 	private static MAIL_PROTOCOLS getProtocol(String account){
-		if(account.contains("mail.ru") || account.contains("inbox.ru")){
+		if(account.contains("inbox.ru")){
 			return MAIL_PROTOCOLS.POP3;
 		}
 		return MAIL_PROTOCOLS.IMAP;
@@ -310,7 +308,14 @@ public class MailUtils {
 		for(int i = 0; i <= 10; i++){
 			// Get session
 			properties.setProperty("mail.store.protocol", "imaps");
-			if(getHost(username).contains("mail.ru")||getHost(username).contains("inbox.ru")){
+			properties.setProperty("mail.imap.ssl.enable", "true");
+			properties.put("mail.imap.port", "993");
+			properties.put("mail.imap.starttls.enable","true");
+			properties.put("mail.imap.socketFactory.port", 993);
+			properties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+			properties.put("mail.imap.socketFactory.fallback", "false");
+			
+			if(getHost(username).contains("inbox.ru")){
 				properties.setProperty("mail.store.protocol", "pop3");
 				properties.setProperty("mail.pop3.ssl.enable", "true");
 				properties.put("mail.pop3.port", "995");
@@ -344,6 +349,38 @@ public class MailUtils {
 		return store;
 	}
 
+	/**
+	 * перемещает все сообщения из папки одной папки в другую
+	 * @param fromFolderName
+	 * @param toFolderName
+	 * @return
+	 */
+	public String moveAllMessages(String fromFolderName, String toFolderName){
+		//Проверка, что соединение установлено
+		try{
+			Folder defaultFolder = store.getDefaultFolder();
+			Folder toFolder = defaultFolder.getFolder(toFolderName);
+			if(!toFolder.exists()){
+				toFolder.create(Folder.READ_WRITE);
+			}	
+			Folder fromFolder = store.getFolder(fromFolderName);
+			fromFolder.open(Folder.READ_WRITE);	
+			int messageCount = fromFolder.getMessageCount();
+			if(messageCount == 0){
+				return String.format("%1$s is empty", fromFolderName);
+			}
+			//Получаем все сообщения из папки
+			Message[] messages = fromFolder.getMessages(1, messageCount);
+			fromFolder.copyMessages(messages, toFolder);
+			fromFolder.close(true);
+			//удаляем все мессаги из fromFolderName
+			deleteAllMessages(fromFolderName);			
+			return String.format("All messages were moved to %1$s form to %2$s successfull ", toFolderName, fromFolderName);
+		}catch(MessagingException e){
+			return "Messaging exception: " + e.getMessage();
+		}
+	}
+	
 	/** Удаляет все сообщения с ящика
 	 * @param folderName название папки с письмами(например "INBOX")
 	 */

@@ -46,4 +46,13 @@
     <servlet-name>DeleteAllMessages</servlet-name>
     <url-pattern>/delete/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>MoveAllInboxMessagesServlet</servlet-name>
+    <servlet-class>com.example.myproject.MoveAllInboxMessagesServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MoveAllInboxMessagesServlet</servlet-name>
+    <url-pattern>/move/*</url-pattern>
+  </servlet-mapping>
 </web-app>

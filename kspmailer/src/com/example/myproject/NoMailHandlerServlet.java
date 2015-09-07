@@ -1,17 +1,12 @@
 package com.example.myproject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.example.myproject.MailUtils.MAIL_PROTOCOLS;
 
 /** сервлет ждет письма в течении 15 сек
  */

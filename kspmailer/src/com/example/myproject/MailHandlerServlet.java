@@ -1,16 +1,11 @@
 package com.example.myproject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.example.myproject.MailUtils.MAIL_PROTOCOLS;
 
 @SuppressWarnings("serial")
 public class MailHandlerServlet extends HttpServlet {
@@ -23,7 +18,9 @@ public class MailHandlerServlet extends HttpServlet {
 	}
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		String info = RegexpUtils.regexGetMatchGroup(req.getRequestURI(), "mail/([\\s\\S]+)", 1, false);
+
+		String requestURI =  java.net.URLDecoder.decode(req.getRequestURI(), "UTF-8");
+		String info = RegexpUtils.regexGetMatchGroup(requestURI, "mail/([\\s\\S]+)", 1, false);
 		String mess = "It is not possible to get message";
 		String account = info.split("/")[0];
 		String subject = info.split("/")[1];
