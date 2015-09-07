@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class MoveAllInboxMessagesServlet extends HttpServlet {
-	private long timeToWait= 60000;
+	private long timeToWait= 60000; 
 	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		String account = RegexpUtils.regexGetMatchGroup(req.getRequestURI(), "move/([\\s\\S]+)", 1, false);
