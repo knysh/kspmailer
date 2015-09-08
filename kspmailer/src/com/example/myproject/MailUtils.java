@@ -55,16 +55,24 @@ public class MailUtils {
 	}
 
 	public MailUtils(String account, long timeToWait){
-		this(getHost(account), account, account.split("@")[0].replace(".", "") + "123", getProtocol(account), timeToWait);
+		this(getHost(account), account, getPassword(account), getProtocol(account), timeToWait);
 	}
 	
+	/**
+	 * cut symbols after "@" and add 123
+	 * @param account
+	 * @return  account without @*** and + 123
+	 */
+	public static String getPassword(String account){
+		return account.split("@")[0].replace(".", "") + "123";
+	}
 	/** returns server host name
 	 * @param account user account
 	 * @return server host name
 	 */
 	private static String getHost(String account){
 		if(account.contains("mail.ru")){
-			return "imap.mail.ru";
+			return "pop.mail.ru";
 		}
 		if(account.contains("inbox.ru")){
 			return "pop.inbox.ru";
@@ -80,7 +88,7 @@ public class MailUtils {
 	 * @return server host name
 	 */
 	private static MAIL_PROTOCOLS getProtocol(String account){
-		if(account.contains("inbox.ru")){
+		if(account.contains("mail.ru")|| account.contains("inbox.ru")){
 			return MAIL_PROTOCOLS.POP3;
 		}
 		return MAIL_PROTOCOLS.IMAP;
@@ -307,15 +315,16 @@ public class MailUtils {
 	private Store connect(){
 		for(int i = 0; i <= 10; i++){
 			// Get session
-			properties.setProperty("mail.store.protocol", "imaps");
-			properties.setProperty("mail.imap.ssl.enable", "true");
-			properties.put("mail.imap.port", "993");
-			properties.put("mail.imap.starttls.enable","true");
-			properties.put("mail.imap.socketFactory.port", 993);
-			properties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-			properties.put("mail.imap.socketFactory.fallback", "false");
-			
-			if(getHost(username).contains("inbox.ru")){
+			if(getHost(username).contains("imap")){
+				properties.setProperty("mail.store.protocol", "imaps");
+				properties.setProperty("mail.imap.ssl.enable", "true");
+				properties.put("mail.imap.port", "993");
+				properties.put("mail.imap.starttls.enable","true");
+				properties.put("mail.imap.socketFactory.port", 993);
+				properties.put("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+				properties.put("mail.imap.socketFactory.fallback", "false");
+			}
+			if(getHost(username).contains("pop")){
 				properties.setProperty("mail.store.protocol", "pop3");
 				properties.setProperty("mail.pop3.ssl.enable", "true");
 				properties.put("mail.pop3.port", "995");
